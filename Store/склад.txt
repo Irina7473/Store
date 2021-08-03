@@ -1,0 +1,58 @@
+
+CREATE TABLE table_goods
+(
+    goods_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT ,
+    goods_name TEXT NOT NULL ,
+    unit TEXT NOT NULL ,
+    type_id INTEGER NOT NULL
+);
+
+CREATE TABLE table_type_goods
+(
+    type_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT ,
+    type_name TEXT NOT NULL
+);
+
+CREATE TABLE table_supplier
+(
+    supplier_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT ,
+    supplier_name TEXT NOT NULL,
+    phone TEXT NOT NULL
+);
+
+CREATE TABLE table_consignments
+(
+    consignments_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT ,
+    consignments_date TEXT NOT NULL,
+    goods_id INTEGER NOT NULL,
+    supplier_id INTEGER NOT NULL,
+    amount INTEGER NOT NULL,
+    supplier_price INTEGER NOT NULL
+);
+
+INSERT INTO table_goods (goods_id, goods_name, unit, type_id) VALUES (1, 'огурцы', 'кг', 1);
+INSERT INTO table_goods (goods_id, goods_name, unit, type_id) VALUES (2, 'помидоры', 'кг', 1);
+INSERT INTO table_goods (goods_id, goods_name, unit, type_id) VALUES (3, 'яблоки', 'кг', 2);
+INSERT INTO table_goods (goods_id, goods_name, unit, type_id) VALUES (4, 'апельсины', 'кг', 2);
+INSERT INTO table_goods (goods_id, goods_name, unit, type_id) VALUES (5, 'арбуз', 'кг', 3);
+INSERT INTO table_goods (goods_id, goods_name, unit, type_id) VALUES (6, 'клубника', 'кг', 3);
+INSERT INTO table_goods (goods_id, goods_name, unit, type_id) VALUES (7, 'сок яблочный 1л', 'шт', 4);
+INSERT INTO table_goods (goods_id, goods_name, unit, type_id) VALUES (8, 'морс клюквенный 0.5л', 'шт', 4);
+
+INSERT INTO table_type_goods (type_id, type_name) VALUES (1, 'овощи');
+INSERT INTO table_type_goods (type_id, type_name) VALUES (2, 'фрукты');
+INSERT INTO table_type_goods (type_id, type_name) VALUES (3, 'ягоды');
+INSERT INTO table_type_goods (type_id, type_name) VALUES (4, 'напитки');
+
+INSERT INTO table_supplier (supplier_id, supplier_name, phone) VALUES (1, 'Дары Крыма', '12345678');
+INSERT INTO table_supplier (supplier_id, supplier_name, phone) VALUES (2, 'Солнце Краснодара', '321654');
+INSERT INTO table_supplier (supplier_id, supplier_name, phone) VALUES (3, 'Раздолье', '789456');
+
+INSERT INTO table_consignments (consignments_id, consignments_date, goods_id, supplier_id, amount, supplier_price) VALUES (1, '20200305', 1, 2, 20, 20);
+INSERT INTO table_consignments (consignments_id, consignments_date, goods_id, supplier_id, amount, supplier_price) VALUES (2, '20200312', 2, 3, 15, 25);
+INSERT INTO table_consignments (consignments_id, consignments_date, goods_id, supplier_id, amount, supplier_price) VALUES (3, '20200325', 3, 1, 30, 40);
+INSERT INTO table_consignments (consignments_id, consignments_date, goods_id, supplier_id, amount, supplier_price) VALUES (4, '20200320', 4, 1, 25, 30);
+INSERT INTO table_consignments (consignments_id, consignments_date, goods_id, supplier_id, amount, supplier_price) VALUES (5, '20200801', 5, 2, 100, 5);
+INSERT INTO table_consignments (consignments_id, consignments_date, goods_id, supplier_id, amount, supplier_price) VALUES (6, '20200715', 6, 3, 30, 100);
+INSERT INTO table_consignments (consignments_id, consignments_date, goods_id, supplier_id, amount, supplier_price) VALUES (7, '20200426', 7, 1, 50, 30);
+INSERT INTO table_consignments (consignments_id, consignments_date, goods_id, supplier_id, amount, supplier_price) VALUES (8, '20200510', 8, 1, 40, 20);
