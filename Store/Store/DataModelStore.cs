@@ -38,35 +38,35 @@ namespace Store
 
     public class Suppliers
     {
-        public int IdSuppliers { get; set; }
-        public string NameSuppliers { get; set; }
+        public int IdSupplier { get; set; }
+        public string NameSupplier { get; set; }
         public string Phone { get; set; }
 
         public Suppliers() { }
-        public Suppliers(int idSuppliers, string nameSuppliers, string phone)
+        public Suppliers(int idSupplier, string nameSupplier, string phone)
         {
-            IdSuppliers = idSuppliers;
-            NameSuppliers = nameSuppliers;
+            IdSupplier = idSupplier;
+            NameSupplier = nameSupplier;
             Phone = phone;
         }
     }
 
     public class Consignments
     {
-        public int IdConsignments { get; set; }
+        public int IdConsignment { get; set; }
         public string Date { get; set; }
         public int IdGoods { get; set; }
-        public int IdSuppliers { get; set; }
+        public int IdSupplier { get; set; }
         public int Amount { get; set; }
         public int SupplierPrice { get; set; }
 
         public Consignments() { }
-        public Consignments(int idConsignments, string date, int idGoods, int idSuppliers, int amount, int supplierPrice)
+        public Consignments(int idConsignment, string date, int idGoods, int idSupplier, int amount, int supplierPrice)
         {
-            IdConsignments = idConsignments;
+            IdConsignment = idConsignment;
             Date = date;
             IdGoods = idGoods;
-            IdSuppliers = idSuppliers;
+            IdSupplier = idSupplier;
             Amount = amount;
             SupplierPrice = supplierPrice;
         }
