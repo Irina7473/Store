@@ -53,6 +53,31 @@ namespace Store
             _connection.Close();
         }
 
+        public string NameGoods(int id)
+        {
+            string nameGoods = "";
+            Open();
+            _query.CommandText =$"SELECT goods_name FROM table_goods WHERE goods_id={id};";
+            var result = _query.ExecuteReader();
+
+            if (!result.HasRows)
+            {
+                Console.WriteLine("Нет данных");
+                return null;
+            }
+                      
+            {
+                while (result.Read())
+                {
+                    nameGoods = result.GetString(0);                    
+                }
+            } while (result.NextResult());
+            
+            if (result != null) result.Close();
+            Close();
+            return nameGoods;
+        }
+
         public void ShowAllGoods()
         {
             Open();
@@ -292,7 +317,11 @@ namespace Store
 
                 DateTime date1 = new DateTime(year, month, day);                
                 var date2= todayDate.AddDays(-number);
-                if (date1 <= date2) Console.WriteLine(date1.ToShortDateString());
+                if (date1 <= date2)
+                {
+                    var nameGoods = NameGoods(consignment.IdGoods);
+                    Console.WriteLine($"Товар {nameGoods} пришел {date1.ToShortDateString()}");
+                }
             }            
         }
     }
