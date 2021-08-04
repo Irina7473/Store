@@ -32,7 +32,7 @@ namespace Store
             try
             {
                 _connection.Open();
-                Console.WriteLine("Успешное подключение к базе данных");
+               // Console.WriteLine("Успешное подключение к базе данных");
             }
             catch (InvalidOperationException)
             {
@@ -100,7 +100,7 @@ namespace Store
             Close();
         }
 
-        public void ShowAllSuppliers()
+        public List<Suppliers> AllSuppliers()
         {
             Open();
             _query.CommandText = "SELECT * FROM table_supplier;";
@@ -109,7 +109,7 @@ namespace Store
             if (!result.HasRows)
             {
                 Console.WriteLine("Нет данных");
-                return;
+                return null;
             }
 
             var suppliers = new List<Suppliers>();
@@ -127,6 +127,15 @@ namespace Store
                     suppliers.Add(supplier);
                 }
             } while (result.NextResult());
+                       
+            if (result != null) result.Close();
+            Close();
+            return suppliers;
+        }
+
+        public void ShowAllSuppliers()
+        {            
+            var suppliers = AllSuppliers();
 
             Console.WriteLine(" --------------------------------------------");
             Console.WriteLine(" ID |  Название поставщика  | Телефон ");
@@ -134,12 +143,9 @@ namespace Store
             foreach (var supplier in suppliers)
                 Console.WriteLine($" {supplier.IdSupplier} | {supplier.NameSupplier} | {supplier.Phone}");
             Console.WriteLine(" --------------------------------------------");
-
-            if (result != null) result.Close();
-            Close();
         }
 
-        public void ShowAllConsignments()
+        public List<Consignments> AllConsignments()
         {
             Open();
             _query.CommandText = "SELECT * FROM table_consignments;";
@@ -148,7 +154,7 @@ namespace Store
             if (!result.HasRows)
             {
                 Console.WriteLine("Нет данных");
-                return;
+                return null;
             }
 
             var consignments = new List<Consignments>();
@@ -167,7 +173,16 @@ namespace Store
                     };
                     consignments.Add(consignment);
                 }
-            } while (result.NextResult());
+            } while (result.NextResult());                      
+
+            if (result != null) result.Close();
+            Close();
+            return consignments;
+        }
+
+        public void ShowAllConsignments()
+        {
+            var consignments = AllConsignments();
 
             Console.WriteLine(" --------------------------------------------");
             Console.WriteLine(" ID |  Дата поставки  |   Товар   |  Поставщик  | Количество | Цена поставщика ");
@@ -176,9 +191,6 @@ namespace Store
                 Console.WriteLine($" {consignment.IdConsignment} | {consignment.Date} | {consignment.IdGoods} " +
                     $"| {consignment.SupplierPrice} | {consignment.Amount} | {consignment.SupplierPrice}");
             Console.WriteLine(" --------------------------------------------");
-
-            if (result != null) result.Close();
-            Close();
         }
 
         public void AddGoods(string nameGoods, string unit, int idType)
@@ -212,6 +224,76 @@ namespace Store
             _query.ExecuteNonQuery();
             Close();
             ShowAllSuppliers();
+        }
+
+        public void GoodsNumberSupplier()
+        {
+            Console.WriteLine("Количество товаров на складе по поставщикам");
+            var consignments = AllConsignments();
+            var suppliers = AllSuppliers();
+
+            foreach(var supplier in suppliers)
+            {
+                var count = 0;
+                foreach (var consignment in consignments)
+                        if (supplier.IdSupplier == consignment.IdSupplier) count += consignment.Amount;
+                Console.WriteLine($"{supplier.NameSupplier} - {count}");
+            }
+        }
+
+        public void MaxGoodsNumberSupplier()
+        {
+            var max = 0;
+            var maxSupplier = "";
+            var consignments = AllConsignments();
+            var suppliers = AllSuppliers();
+
+            foreach (var supplier in suppliers)
+            {
+                var count = 0;
+                foreach (var consignment in consignments)
+                        if (supplier.IdSupplier == consignment.IdSupplier) count += consignment.Amount;
+
+                if (max < count)
+                {
+                    max = count;
+                    maxSupplier = supplier.NameSupplier;
+                }                
+            }
+
+            foreach (var supplier in suppliers)
+                   if(supplier.NameSupplier== maxSupplier) Console.WriteLine($"Больше всего товаров на складе от поставщика " +
+                       $"{supplier.NameSupplier}, телефон - {supplier.Phone}, в количестве {max}");           
+        }
+
+        public void DeliveryTimeGoods(int number)
+        {
+            Console.WriteLine($"Товары с поставки, которых прошло {number} дней");
+            var todayDate = DateTime.Now;
+            var consignments = AllConsignments();
+            
+            foreach (var consignment in consignments)
+            {
+                string dateyear = "";
+                string datemonth = "";
+                string dateday = "";
+
+                char[] dateCon = consignment.Date.ToCharArray();
+                for (int i = 0; i < dateCon.Length; i++)
+                {
+                    if (i < 4) dateyear += dateCon[i];
+                    if (i > 3 && i < 6) datemonth += dateCon[i];
+                    if (i > 5 && i < 8) dateday += dateCon[i];
+                }
+
+                var year = Convert.ToInt32(dateyear);
+                var month = Convert.ToInt32(datemonth);
+                var day = Convert.ToInt32(dateday);
+
+                DateTime date1 = new DateTime(year, month, day);                
+                var date2= todayDate.AddDays(-number);
+                if (date1 <= date2) Console.WriteLine(date1.ToShortDateString());
+            }            
         }
     }
 }

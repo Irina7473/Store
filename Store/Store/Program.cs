@@ -24,6 +24,12 @@ namespace Store
             Console.WriteLine();
             DB.UpdateSupplier("Раздолье","4445556");
             Console.WriteLine();
+            DB.GoodsNumberSupplier();
+            Console.WriteLine();
+            DB.MaxGoodsNumberSupplier();
+            Console.WriteLine();
+            DB.DeliveryTimeGoods(460);
+            Console.WriteLine();
         }
     }
 }
