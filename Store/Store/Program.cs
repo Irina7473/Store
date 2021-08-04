@@ -17,9 +17,12 @@ namespace Store
             Console.WriteLine();
             DB.ShowAllConsignments();
             Console.WriteLine();
-
-            
+                        
             DB.AddGoods("баклажаны", "кг", 1);
+            Console.WriteLine();
+            DB.DeleteGoods("арбуз");
+            Console.WriteLine();
+            DB.UpdateSupplier("Раздолье","4445556");
             Console.WriteLine();
         }
     }

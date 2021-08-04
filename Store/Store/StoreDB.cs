@@ -182,8 +182,7 @@ namespace Store
         }
 
         public void AddGoods(string nameGoods, string unit, int idType)
-        {
-            //string sqlExpression = "INSERT INTO Users (Name, Age) VALUES (@name, @age)";
+        {            
             Open();
             SqliteParameter nameParam = new SqliteParameter("@name", nameGoods);
             _query.Parameters.Add(nameParam);
@@ -195,6 +194,24 @@ namespace Store
             _query.ExecuteNonQuery();            
             Close();
             ShowAllGoods();
+        }
+
+        public void DeleteGoods(string nameGoods)
+        {            
+            Open();                        
+            _query.CommandText = $"DELETE FROM table_goods WHERE goods_name='{nameGoods}';";
+            _query.ExecuteNonQuery();
+            Close();
+            ShowAllGoods();
+        }
+
+        public void UpdateSupplier(string nameSupplier, string phone)
+        {
+            Open();
+            _query.CommandText = $"UPDATE table_supplier SET phone='{phone}' WHERE supplier_name='{nameSupplier}';";
+            _query.ExecuteNonQuery();
+            Close();
+            ShowAllSuppliers();
         }
     }
 }
