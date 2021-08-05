@@ -53,32 +53,7 @@ namespace Store
             _connection.Close();
         }
 
-        public string NameGoods(int id)
-        {
-            string nameGoods = "";
-            Open();
-            _query.CommandText =$"SELECT goods_name FROM table_goods WHERE goods_id={id};";
-            var result = _query.ExecuteReader();
-
-            if (!result.HasRows)
-            {
-                Console.WriteLine("Нет данных");
-                return null;
-            }
-                      
-            {
-                while (result.Read())
-                {
-                    nameGoods = result.GetString(0);                    
-                }
-            } while (result.NextResult());
-            
-            if (result != null) result.Close();
-            Close();
-            return nameGoods;
-        }
-
-        public void ShowAllGoods()
+        public List<Goods> AllGoods()
         {
             Open();
             _query.CommandText = "SELECT * FROM table_goods;";
@@ -87,42 +62,61 @@ namespace Store
             if (!result.HasRows)
             {
                 Console.WriteLine("Нет данных");
-                return;
+                return null;
             }
 
             var goodsList = new List<Goods>();
             do
             {
                 while (result.Read())
-                {
-                    /*
-                    var Id = result.GetInt32(3);
-                    _query.CommandText = $"SELECT type_name FROM table_type_goods WHERE type_id={Id};";
-                    var resultType = _query.ExecuteReader();
-                    resultType.Read();     
-                    */
+                {                    
                     var goods = new Goods
                     {
                         IdGoods = result.GetInt32(0),
                         NameGoods = result.GetString(1),
                         Unit = result.GetString(2),
-                        IdType = result.GetInt32(3)
-                        //IdType = resultType.GetString(0)
+                        IdType = result.GetInt32(3)                        
                     };
-                    
+
                     goodsList.Add(goods);
                 }
-            } while (result.NextResult());
-
-            Console.WriteLine(" --------------------------------------------");
-            Console.WriteLine(" ID |  Название  | Ед.измер. |  Тип товара  ");
-            Console.WriteLine(" --------------------------------------------");
-            foreach (var goods in goodsList)
-                Console.WriteLine($" {goods.IdGoods} | {goods.NameGoods} | {goods.Unit} | {goods.IdType} ");
-            Console.WriteLine(" --------------------------------------------");
+            } while (result.NextResult());            
 
             if (result != null) result.Close();
             Close();
+            return goodsList;
+        }
+
+        public List<TypeGoods> AllTypeGoods()
+        {
+            Open();
+            _query.CommandText = "SELECT * FROM table_type_goods;";
+            var result = _query.ExecuteReader();
+
+            if (!result.HasRows)
+            {
+                Console.WriteLine("Нет данных");
+                return null;
+            }
+
+            var typeList = new List<TypeGoods>();
+            do
+            {
+                while (result.Read())
+                {
+                    var type = new TypeGoods
+                    {
+                        IdType = result.GetInt32(0),
+                        NameType = result.GetString(1)                        
+                    };
+
+                    typeList.Add(type);
+                }
+            } while (result.NextResult());
+
+            if (result != null) result.Close();
+            Close();
+            return typeList;
         }
 
         public List<Suppliers> AllSuppliers()
@@ -141,7 +135,7 @@ namespace Store
             do
             {
                 while (result.Read())
-                {                    
+                {
                     var supplier = new Suppliers
                     {
                         IdSupplier = result.GetInt32(0),
@@ -152,22 +146,10 @@ namespace Store
                     suppliers.Add(supplier);
                 }
             } while (result.NextResult());
-                       
+
             if (result != null) result.Close();
             Close();
             return suppliers;
-        }
-
-        public void ShowAllSuppliers()
-        {            
-            var suppliers = AllSuppliers();
-
-            Console.WriteLine(" --------------------------------------------");
-            Console.WriteLine(" ID |  Название поставщика  | Телефон ");
-            Console.WriteLine(" --------------------------------------------");
-            foreach (var supplier in suppliers)
-                Console.WriteLine($" {supplier.IdSupplier} | {supplier.NameSupplier} | {supplier.Phone}");
-            Console.WriteLine(" --------------------------------------------");
         }
 
         public List<Consignments> AllConsignments()
@@ -198,26 +180,60 @@ namespace Store
                     };
                     consignments.Add(consignment);
                 }
-            } while (result.NextResult());                      
+            } while (result.NextResult());
 
             if (result != null) result.Close();
             Close();
             return consignments;
         }
 
+        public void ShowAllGoods()
+        {     
+            var goodsList = AllGoods();
+            var typeList = AllTypeGoods();
+            Console.WriteLine(" --------------------------------------------");
+            Console.WriteLine(" ID |  Название  | Ед.измер. |  Тип товара  ");
+            Console.WriteLine(" --------------------------------------------");
+            foreach (var goods in goodsList)
+                foreach (var type in typeList)
+                    if (goods.IdType==type.IdType) Console.WriteLine($" {goods.IdGoods} | {goods.NameGoods} " +
+                        $"| {goods.Unit} | {type.NameType} ");
+            Console.WriteLine(" --------------------------------------------");                        
+        }
+              
+        public void ShowAllSuppliers()
+        {            
+            var suppliers = AllSuppliers();
+
+            Console.WriteLine(" --------------------------------------------");
+            Console.WriteLine(" ID |  Название поставщика  | Телефон ");
+            Console.WriteLine(" --------------------------------------------");
+            foreach (var supplier in suppliers)
+                Console.WriteLine($" {supplier.IdSupplier} | {supplier.NameSupplier} | {supplier.Phone}");
+            Console.WriteLine(" --------------------------------------------");
+        }
+
         public void ShowAllConsignments()
         {
+            var goodsList = AllGoods();            
+            var suppliers = AllSuppliers();
             var consignments = AllConsignments();
 
             Console.WriteLine(" --------------------------------------------");
             Console.WriteLine(" ID |  Дата поставки  |   Товар   |  Поставщик  | Количество | Цена поставщика ");
             Console.WriteLine(" --------------------------------------------");
             foreach (var consignment in consignments)
-                Console.WriteLine($" {consignment.IdConsignment} | {consignment.Date} | {consignment.IdGoods} " +
-                    $"| {consignment.SupplierPrice} | {consignment.Amount} | {consignment.SupplierPrice}");
+            {
+                Console.Write($" {consignment.IdConsignment} | {consignment.Date} | ");
+                foreach (var goods in goodsList)
+                    if (consignment.IdGoods==goods.IdGoods) Console.Write($"{goods.NameGoods} | ");
+                foreach (var supplier in suppliers)
+                    if (consignment.IdSupplier == supplier.IdSupplier) Console.Write($"{supplier.NameSupplier} | ");
+                Console.WriteLine($"{consignment.Amount} | {consignment.SupplierPrice}");
+            }
             Console.WriteLine(" --------------------------------------------");
         }
-
+                
         public void AddGoods(string nameGoods, string unit, int idType)
         {            
             Open();
@@ -249,6 +265,31 @@ namespace Store
             _query.ExecuteNonQuery();
             Close();
             ShowAllSuppliers();
+        }
+
+        public string NameGoods(int id)
+        {
+            string nameGoods = "";
+            Open();
+            _query.CommandText = $"SELECT goods_name FROM table_goods WHERE goods_id={id};";
+            var result = _query.ExecuteReader();
+
+            if (!result.HasRows)
+            {
+                Console.WriteLine("Нет данных");
+                return null;
+            }
+
+            {
+                while (result.Read())
+                {
+                    nameGoods = result.GetString(0);
+                }
+            } while (result.NextResult()) ;
+
+            if (result != null) result.Close();
+            Close();
+            return nameGoods;
         }
 
         public void GoodsNumberSupplier()
