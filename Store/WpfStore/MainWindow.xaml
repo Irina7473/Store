@@ -6,7 +6,29 @@
         xmlns:local="clr-namespace:WpfStore"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
-    <Grid>
-
-    </Grid>
+    <TabControl>
+        <TabItem Header="База данных СКЛАД">
+            <StackPanel>
+            <TextBlock Text="Показ таблиц БД" FontSize="20" 
+                           Height="40" Width="300" HorizontalAlignment="Center"/>
+            <ComboBox x:Name="SelectTable" SelectionChanged="SelectTable_SelectionChanged" 
+                          FontSize="20" Height="40" Width="300" HorizontalAlignment="Center" >
+                <TextBlock Text="Товары"/>
+                <TextBlock Text="Типы товаров"/>
+                <TextBlock Text="Поставщики"/>
+                <TextBlock Text="Поставки"/>
+            </ComboBox>
+                <ListView Name="Table">
+                    
+                </ListView>
+            </StackPanel>
+        </TabItem>
+        <TabItem Header="Запросы к БД">
+            <StackPanel>
+                <Button x:Name="Connect" Content="Подключение к базе данных">
+                    
+                </Button>
+            </StackPanel>
+        </TabItem>
+    </TabControl>
 </Window>

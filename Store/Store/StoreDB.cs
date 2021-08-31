@@ -53,6 +53,140 @@ namespace Store
             _connection.Close();
         }
 
+        public Dictionary <int, Goods> AllGoodsD()
+        {
+            Open();
+            _query.CommandText = "SELECT * FROM table_goods;";
+            var result = _query.ExecuteReader();
+
+            if (!result.HasRows)
+            {
+                Console.WriteLine("Нет данных");
+                return null;
+            }
+
+            var goodsDictionary =  new Dictionary<int, Goods>();            
+            do
+            {
+                while (result.Read())
+                {                    
+                    var goods = new Goods
+                    {
+                        IdGoods = result.GetInt32(0),
+                        NameGoods = result.GetString(1),
+                        Unit = result.GetString(2),
+                        IdType = result.GetInt32(3)                        
+                    };
+
+                    goodsDictionary.Add(goods.IdGoods, goods);
+                }
+            } while (result.NextResult());            
+
+            if (result != null) result.Close();
+            Close();
+            return goodsDictionary;
+        }
+
+        public Dictionary<int, string> AllTypeGoodsD()
+        {
+            Open();
+            _query.CommandText = "SELECT * FROM table_type_goods;";
+            var result = _query.ExecuteReader();
+
+            if (!result.HasRows)
+            {
+                Console.WriteLine("Нет данных");
+                return null;
+            }
+
+            var types = new Dictionary<int, string>();
+            do
+            {
+                while (result.Read())
+                {
+                    var type = new TypeGoods
+                    {
+                        IdType = result.GetInt32(0),
+                        NameType = result.GetString(1)
+                    };
+
+                    types.Add(type.IdType, type.NameType);
+                }
+            } while (result.NextResult());
+
+            if (result != null) result.Close();
+            Close();
+            return types;
+        }
+
+        public Dictionary<int, Suppliers> AllSuppliersD()
+        {
+            Open();
+            _query.CommandText = "SELECT * FROM table_supplier;";
+            var result = _query.ExecuteReader();
+
+            if (!result.HasRows)
+            {
+                Console.WriteLine("Нет данных");
+                return null;
+            }
+
+            var suppliers = new Dictionary<int, Suppliers>();
+            do
+            {
+                while (result.Read())
+                {
+                    var supplier = new Suppliers
+                    {
+                        IdSupplier = result.GetInt32(0),
+                        NameSupplier = result.GetString(1),
+                        Phone = result.GetString(2)
+                    };
+
+                    suppliers.Add(supplier.IdSupplier, supplier);
+                }
+            } while (result.NextResult());
+
+            if (result != null) result.Close();
+            Close();
+            return suppliers;
+        }
+
+        public Dictionary<int, Consignments> AllConsignmentsD()
+        {
+            Open();
+            _query.CommandText = "SELECT * FROM table_consignments;";
+            var result = _query.ExecuteReader();
+
+            if (!result.HasRows)
+            {
+                Console.WriteLine("Нет данных");
+                return null;
+            }
+
+            var consignments = new Dictionary<int, Consignments>();
+            do
+            {
+                while (result.Read())
+                {
+                    var consignment = new Consignments
+                    {
+                        IdConsignment = result.GetInt32(0),
+                        Date = result.GetString(1),
+                        IdGoods = result.GetInt32(2),
+                        IdSupplier = result.GetInt32(3),
+                        Amount = result.GetInt32(4),
+                        SupplierPrice = result.GetInt32(5),
+                    };
+                    consignments.Add(consignment.IdConsignment, consignment);
+                }
+            } while (result.NextResult());
+
+            if (result != null) result.Close();
+            Close();
+            return consignments;
+        }
+
         public List<Goods> AllGoods()
         {
             Open();
@@ -69,18 +203,18 @@ namespace Store
             do
             {
                 while (result.Read())
-                {                    
+                {
                     var goods = new Goods
                     {
                         IdGoods = result.GetInt32(0),
                         NameGoods = result.GetString(1),
                         Unit = result.GetString(2),
-                        IdType = result.GetInt32(3)                        
+                        IdType = result.GetInt32(3)
                     };
 
                     goodsList.Add(goods);
                 }
-            } while (result.NextResult());            
+            } while (result.NextResult());
 
             if (result != null) result.Close();
             Close();
@@ -188,7 +322,19 @@ namespace Store
         }
 
         public void ShowAllGoods()
-        {     
+        {
+            // Вариант с Dictionary
+            var goodsDictionary = AllGoodsD();
+            var types = AllTypeGoodsD();
+            Console.WriteLine(" --------------------------------------------");
+            Console.WriteLine(" ID |  Название  | Ед.измер. |  Тип товара  ");
+            Console.WriteLine(" --------------------------------------------");
+            foreach (var goods in goodsDictionary)
+                 Console.WriteLine($"{goods.Key} | {goods.Value.NameGoods} | {goods.Value.Unit} | {types[goods.Value.IdType]}");            
+            Console.WriteLine(" --------------------------------------------");
+
+
+            /*     Вариант со списком
             var goodsList = AllGoods();
             var typeList = AllTypeGoods();
             Console.WriteLine(" --------------------------------------------");
@@ -198,23 +344,49 @@ namespace Store
                 foreach (var type in typeList)
                     if (goods.IdType==type.IdType) Console.WriteLine($" {goods.IdGoods} | {goods.NameGoods} " +
                         $"| {goods.Unit} | {type.NameType} ");
-            Console.WriteLine(" --------------------------------------------");                        
+            Console.WriteLine(" --------------------------------------------");    
+            */
         }
               
         public void ShowAllSuppliers()
-        {            
-            var suppliers = AllSuppliers();
+        {
+            // Вариант с Dictionary
+            var suppliers = AllSuppliersD();
+            
+            Console.WriteLine(" --------------------------------------------");
+            Console.WriteLine(" ID |  Название поставщика  | Телефон ");
+            Console.WriteLine(" --------------------------------------------");
+            foreach (var supplier in suppliers)
+                Console.WriteLine($"{supplier.Key} | {supplier.Value.NameSupplier} | {supplier.Value.Phone}");
+            Console.WriteLine(" --------------------------------------------");
 
+            /*     Вариант со списком
+            var suppliers = AllSuppliers();
             Console.WriteLine(" --------------------------------------------");
             Console.WriteLine(" ID |  Название поставщика  | Телефон ");
             Console.WriteLine(" --------------------------------------------");
             foreach (var supplier in suppliers)
                 Console.WriteLine($" {supplier.IdSupplier} | {supplier.NameSupplier} | {supplier.Phone}");
             Console.WriteLine(" --------------------------------------------");
+            */
         }
 
         public void ShowAllConsignments()
         {
+            // Вариант с Dictionary
+            var consignments = AllConsignmentsD();
+            var goods = AllGoodsD();
+            var suppliers = AllSuppliersD();
+            Console.WriteLine(" --------------------------------------------");
+            Console.WriteLine(" ID | Дата поставки | Товар | Поставщик | Количество | Цена поставщика ");
+            Console.WriteLine(" --------------------------------------------");
+            foreach (var consignment in consignments)
+                Console.WriteLine($"{consignment.Key} | {consignment.Value.Date} | {goods[consignment.Value.IdGoods].NameGoods} " +
+                    $"| {suppliers[consignment.Value.IdSupplier].NameSupplier} | {consignment.Value.Amount} | {consignment.Value.SupplierPrice}");
+            Console.WriteLine(" --------------------------------------------");
+
+
+            /*     Вариант со списком
             var goodsList = AllGoods();            
             var suppliers = AllSuppliers();
             var consignments = AllConsignments();
@@ -232,6 +404,7 @@ namespace Store
                 Console.WriteLine($"{consignment.Amount} | {consignment.SupplierPrice}");
             }
             Console.WriteLine(" --------------------------------------------");
+            */
         }
                 
         public void AddGoods(string nameGoods, string unit, int idType)
@@ -269,6 +442,13 @@ namespace Store
 
         public string NameGoods(int id)
         {
+            // Вариант с Dictionary            
+            var goodsDictionary = AllGoodsD();
+            foreach (var goods in goodsDictionary)
+                if (goods.Key == id) return goods.Value.NameGoods;                
+            return null;
+
+            /*
             string nameGoods = "";
             Open();
             _query.CommandText = $"SELECT goods_name FROM table_goods WHERE goods_id={id};";
@@ -290,11 +470,26 @@ namespace Store
             if (result != null) result.Close();
             Close();
             return nameGoods;
+            */
         }
 
         public void GoodsNumberSupplier()
         {
             Console.WriteLine("Количество товаров на складе по поставщикам");
+
+            // Вариант с Dictionary
+            var consignments = AllConsignmentsD();            
+            var suppliers = AllSuppliersD();
+
+            foreach (var supplier in suppliers)
+            {
+                var count = 0;
+                foreach (var consignment in consignments)
+                    if (supplier.Key == consignment.Value.IdSupplier) count += consignment.Value.Amount;
+                Console.WriteLine($"{supplier.Value.NameSupplier} - {count}");
+            }            
+
+            /*     Вариант со списком
             var consignments = AllConsignments();
             var suppliers = AllSuppliers();
 
@@ -305,31 +500,33 @@ namespace Store
                         if (supplier.IdSupplier == consignment.IdSupplier) count += consignment.Amount;
                 Console.WriteLine($"{supplier.NameSupplier} - {count}");
             }
+            */
         }
 
         public void MaxGoodsNumberSupplier()
         {
             var max = 0;
-            var maxSupplier = "";
-            var consignments = AllConsignments();
-            var suppliers = AllSuppliers();
+            var maxSupplier = 0;
+
+            // Вариант с Dictionary 
+            var consignments = AllConsignmentsD();
+            var suppliers = AllSuppliersD();
 
             foreach (var supplier in suppliers)
             {
                 var count = 0;
                 foreach (var consignment in consignments)
-                        if (supplier.IdSupplier == consignment.IdSupplier) count += consignment.Amount;
+                        if (supplier.Key == consignment.Value.IdSupplier) count += consignment.Value.Amount;
 
                 if (max < count)
                 {
                     max = count;
-                    maxSupplier = supplier.NameSupplier;
+                    maxSupplier = supplier.Key;
                 }                
             }
 
-            foreach (var supplier in suppliers)
-                   if(supplier.NameSupplier== maxSupplier) Console.WriteLine($"Больше всего товаров на складе от поставщика " +
-                       $"{supplier.NameSupplier}, телефон - {supplier.Phone}, в количестве {max}");           
+            Console.WriteLine($"Больше всего товаров на складе от поставщика " +
+                       $"{suppliers[maxSupplier].NameSupplier}, телефон - {suppliers[maxSupplier].Phone}, в количестве {max}");           
         }
 
         public void DeliveryTimeGoods(int number)

@@ -24,5 +24,14 @@ namespace WpfStore
         {
             InitializeComponent();
         }
+
+        private void SelectTable_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var select = ((TextBlock)SelectTable.SelectedItem).Text;
+            if (select == "Товары") ;
+            if (select == "Типы товаров") ;
+            if (select == "Поставщики") ;
+            if (select == "Поставки") ; 
+        }
     }
 }
